@@ -752,6 +752,10 @@ def main():
                         action="store_true",
                         help="Further contextualized BERT outputs with BILSTMs")
     
+    
+    parser.add_argument("--evalb_param",
+                       help="[True|False] to indicate whether use the COLLINS.prm parameter file")
+    
     parser.add_argument("--parsing_paradigm",
                         type=str,
                         help="[constituency|dependencies]")
