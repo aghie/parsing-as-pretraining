@@ -754,6 +754,7 @@ def main():
     
     
     parser.add_argument("--evalb_param",
+                       default=None,
                        help="[True|False] to indicate whether use the COLLINS.prm parameter file")
     
     parser.add_argument("--parsing_paradigm",
