@@ -77,6 +77,7 @@ General parameter description:
 - `--do_train`: Activate to train the model
 - `--do_eval`: Activate to evaluate the model on the dev set
 - `--do_test`: Activate to run the model on the test set
+- `--do_lower_case`: To lower case the input when using an uncased model (e.g. `bert-base-uncased`) 
 
 Additional options:
 
@@ -146,6 +147,7 @@ Example for dependency parsing:
 	--parsing_paradigm dependencies --do_test [--use_bilstms]
 ```
 
+**Note**: Remember to use the option `--do_lower_case` too, in case you trained an uncased model.
 
 ## Getting some extra stats
 
