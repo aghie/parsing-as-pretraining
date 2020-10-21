@@ -307,19 +307,21 @@ def _valid_wordpiece_indexes(sent, wp_sent):
         if missing_chars == "":
             idx+=1
         
+        
     return valid_idxs
     
 
 
 
-def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer):
+def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer, args):
     """Loads a data file into a list of `InputBatch`s."""
 
     label_map = {label : i for i, label in enumerate(label_list)}
     label_map_reverse = {i:label for i, label in enumerate(label_list)}
     features = []
     for (ex_index, example) in enumerate(examples):
-        ori_tokens_a = example.text_a.split(" ")
+        ori_tokens_a = example.text_a.split(" ") if not args.do_lower_case else example.text_a.lower().split(" ")
+
         tokens_a = tokenizer.tokenize(example.text_a)
 
         tokens_b = None
@@ -488,6 +490,7 @@ def posprocess_labels(preds):
 
 
 def evaluate(model, device, logger, processor,data_dir, max_seq_length, tokenizer, label_list, 
+             args,
              eval_batch_size, output_dir, 
              #path_evaluation_script, 
              path_gold, 
@@ -501,7 +504,7 @@ def evaluate(model, device, logger, processor,data_dir, max_seq_length, tokenize
         eval_examples = processor.get_dev_examples(data_dir)
     
     eval_features = convert_examples_to_features(
-        eval_examples, label_list, max_seq_length, tokenizer)
+        eval_examples, label_list, max_seq_length, tokenizer, args)
     logger.info("***** Running evaluation *****")
     logger.info("  Num examples = %d", len(eval_examples))
     logger.info("  Batch size = %d", eval_batch_size)
@@ -573,6 +576,7 @@ def evaluate(model, device, logger, processor,data_dir, max_seq_length, tokenize
             writer.write("%s = %s\n" % (key, str(result[key])))
 
     if parsing_paradigm.lower() == "dependencies":
+        
 
         command = [#"PYTHONPATH="+abspath(join(dirname(__file__), data.dep2labels)),
                            "python",
@@ -771,8 +775,6 @@ def main():
                         help="Path to the gold file in conllu formart")      
 
     args = parser.parse_args()
-
-
     processors = {"sl_tsv": SLProcessor}
 
 
@@ -883,7 +885,7 @@ def main():
     tr_loss = 0
     if args.do_train:
         train_features = convert_examples_to_features(
-            train_examples, label_list, args.max_seq_length, tokenizer)
+            train_examples, label_list, args.max_seq_length, tokenizer, args)
         logger.info("***** Running training *****")
         logger.info("  Num examples = %d", len(train_examples))
         logger.info("  Batch size = %d", args.train_batch_size)
@@ -944,6 +946,7 @@ def main():
             
             dev_loss, dev_acc, dev_eval_score, _ = evaluate(model, device, logger, processor, args.data_dir, 
                                                    args.max_seq_length, tokenizer, label_list,
+                                                   args,
                                                    args.eval_batch_size, args.model_dir, 
                                                    #path_evaluation,
                                                     path_gold,
@@ -996,6 +999,7 @@ def main():
             
         loss, acc, eval_score, detailed_score = evaluate(model, device, logger, processor, args.data_dir, 
                                                args.max_seq_length, tokenizer, label_list,
+                                               args,
                                                args.eval_batch_size, 
                                                args.output_dir,  
                                                path_gold,
